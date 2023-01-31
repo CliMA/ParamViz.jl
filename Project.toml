@@ -1,0 +1,4 @@
+name = "ParamViz"
+uuid = "9706fb73-1de9-418d-83da-fef8cd99bb4a"
+authors = ["AlexisRenchon <a.renchon@gmail.com>"]
+version = "0.1.0"
