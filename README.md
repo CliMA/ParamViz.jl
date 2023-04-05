@@ -1,4 +1,3 @@
-test
 To test locally:
 first, clone the repo
 
@@ -31,3 +30,7 @@ julia> param_dashboard(model_parameters, model_functions, drivers_name, drivers_
 
 then open this URL in your browser 
 http://localhost:9384/browser-display
+
+
+This branch aims to use another formatting of parameter struct. 
+The previous format will probably just be removed. 
