@@ -5,19 +5,12 @@ using Statistics
 using ClimaLSM, ClimaLSM.Soil.Biogeochemistry
 include(joinpath(pkgdir(ClimaLSM), "parameters", "create_parameters.jl")) 
 include("src/fun_discretisation.jl")
-=#
-
-#= run using Module (work as a package, but is not registered)
-using parameterization_viz # local
-using ClimaLSM, ClimaLSM.Soil.Biogeochemistry
 
 model_parameters = SoilCO2ModelParameters
 model_functions = Dict("CO2 production" => (d1, d2, p) -> microbe_source(d1, d2, 5.0, p),
                        "CO2 diffusivity" => co2_diffusivity)
 drivers_name = ["T_soil", "M_soil"]
 drivers_limit = ([273, 303], [0.0, 0.5])
-
-param_dashboard(model_parameters, model_functions, drivers_name, drivers_limit)
 =#
 
 """
