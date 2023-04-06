@@ -13,6 +13,18 @@ drivers_name = ["T_soil", "M_soil"]
 drivers_limit = ([273, 303], [0.0, 0.5])
 =#
 
+#= Test with vegetation format, e.g., Penman Monteith
+using ClimaLSM
+
+ClimaLSM.Canopy.medlyn_conductance # the function
+ClimaLSM.Canopy.medlyn_term # term needed for function
+ClimaLSM.Canopy.MedlynConductanceParameters # default values for Drel, g0 and g1. Drel is a constant
+
+
+
+
+=#
+
 """
     param_dashboard(model_parameters, model_functions, drivers_name, drivers_limit)
 
