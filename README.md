@@ -47,3 +47,5 @@ Could later dispatch simpler methods.
 `model_function`
 
 Let's make it just 1 function for now. As before, user need to specify which arguments of the function are driver 1 (axe x) and driver 2 (axe y). 
+
+Also, as mentionned by Simon, widgets should be JSServe widget, and avoid WGLMakie widgets (works better)
