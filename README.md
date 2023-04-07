@@ -34,3 +34,16 @@ http://localhost:9384/browser-display
 
 This branch aims to use another formatting of parameter struct. 
 The previous format will probably just be removed. 
+
+NOTES:
+Let's make it so param_dashboard needs 2 inputs: 
+
+`model_parameters`
+
+A Struct or Dict containing parameters, that includes drivers, their limits, and the step for slider. 
+This will mean that user need to enter more info, but it makes things more flexible. 
+Could later dispatch simpler methods. 
+
+`model_function`
+
+Let's make it just 1 function for now. As before, user need to specify which arguments of the function are driver 1 (axe x) and driver 2 (axe y). 
