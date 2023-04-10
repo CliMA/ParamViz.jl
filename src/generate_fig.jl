@@ -19,11 +19,34 @@ using ClimaLSM
 ClimaLSM.Canopy.medlyn_conductance # the function
 ClimaLSM.Canopy.medlyn_term # term needed for function
 ClimaLSM.Canopy.MedlynConductanceParameters # default values for Drel, g0 and g1. Drel is a constant
-
-
-
-
 =#
+
+#= get names of arguments of a function f
+f(x,y,z) = xyz # for example
+ms = collect(methods(f)) 
+function method_argnames(m::Method) # from https://github.com/JuliaLang/julia/blob/master/base/methodshow.jl
+    argnames = ccall(:jl_uncompress_argnames, Vector{Symbol}, (Any,), m.slot_syms)
+    isempty(argnames) && return argnames
+    return argnames[1:m.nargs]
+end
+method_argnames(last(ms))[2:end]
+=#
+
+# maybe by default, x axis is 1st argument, y axis is 2nd argument. 
+# add a menu to select x axis and y axis (from argument list). 
+
+# Arguments of param_dashboard: Model (a function...)
+# Optional argument of param_dashboard: Range (a Tuple, e.g., ([min, max], [min, max], ...))
+
+# if no Range given, just do val/2:val/4:val*2
+
+# Need starting values too! Should this be optional arg as well? These starting values need to be within Range...
+
+# Try with ClimaLSM.Canopy.penman_monteith
+
+# First, let's redefine function without constants
+
+
 
 """
     param_dashboard(model_parameters, model_functions, drivers_name, drivers_limit)
