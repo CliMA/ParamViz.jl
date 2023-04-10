@@ -21,6 +21,7 @@ ClimaLSM.Canopy.medlyn_term # term needed for function
 ClimaLSM.Canopy.MedlynConductanceParameters # default values for Drel, g0 and g1. Drel is a constant
 =#
 
+
 #= get names of arguments of a function f
 f(x,y,z) = xyz # for example
 ms = collect(methods(f)) 
@@ -46,7 +47,29 @@ method_argnames(last(ms))[2:end]
 
 # First, let's redefine function without constants
 
+# Lv = 2453 MJ m−3 # Volumetric latent heat of vaporization
+# cp = 1005 J/kg-K # specific heat of air at constant pressure
+# Δ =  125 Pa K−1
+# ρa = 1.293 kg m−3 # dry air density 
+# γ = 66 Pa K−1 # Psychrometric constant
 
+#= ga is calculated...
+conditions = surface_fluxes(atmos, canopy, Y, p, t0) #Per unit m^2 of leaf
+r_ae = 1 / (conditions.Ch * abs(atmos.u(t0))) # s/m
+ga = 1 / r_ae
+=#
+
+# penman_monteith(Rn, G, VPD, ga, gs) -> ClimaLSM.Canopy.penman_monteith(125, Rn, G, 1.293, 1005, VPD, ga, 66, gs, 2453)
+
+# Maybe try another function... 
+function testf(x, y, p1, p2)
+    p1*sin(x)+p2*sin(y)
+end
+
+# make a function to make it work with param_dashboard(testf, ([-5 5], [-5 5], [-5 5], [-5 5]))
+# for now, let's make it that first argument is x, second argument is y
+# as param_dashboard(Model, Ranges)
+# intial value will be middle of Range
 
 """
     param_dashboard(model_parameters, model_functions, drivers_name, drivers_limit)
