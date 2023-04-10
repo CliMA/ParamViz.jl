@@ -62,9 +62,20 @@ ga = 1 / r_ae
 # penman_monteith(Rn, G, VPD, ga, gs) -> ClimaLSM.Canopy.penman_monteith(125, Rn, G, 1.293, 1005, VPD, ga, 66, gs, 2453)
 
 # Maybe try another function... 
-function testf(x, y, p1, p2)
-    p1*sin(x)+p2*sin(y)
+
+struct drivers
+  x
+  y
 end
+
+
+function testf((x, y), (p1, p2), (c1)) # testf(drivers(x, y), parameters(p1, p2), constants(c1))
+    p1*sin(x) + p2*sin(y) + c1
+end
+
+# for param_dashboard, give functions as f(drivers, parameters, constants)
+# and Ranges(drivers, parameters) 
+
 
 # make a function to make it work with param_dashboard(testf, ([-5 5], [-5 5], [-5 5], [-5 5]))
 # for now, let's make it that first argument is x, second argument is y
