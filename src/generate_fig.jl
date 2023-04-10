@@ -63,24 +63,89 @@ ga = 1 / r_ae
 
 # Maybe try another function... 
 
-struct drivers
-  x
-  y
+
+struct Drivers
+  names
+  values
+  ranges
+end
+
+struct Parameters
+  names
+  values
+  ranges
+end
+
+struct Constants
+  names
+  values
+end
+
+struct Inputs
+  drivers::Drivers
+  parameters::Parameters
+  constants::Constants
+end
+
+function parameterisation(inputs::Inputs) 
+    x, y = inputs.drivers.values[1], inputs.drivers.values[2]
+    p1, p2 = inputs.parameters.values[1], inputs.parameters.values[2]
+    c1, c2 = inputs.constants.values[1], inputs.constants.values[2]
+    return p1*sin(x) + p2*sin(y) + c1 + c2
+end
+
+drivers = Drivers(("x", "y"), (1, 1), ([-5, 5], [-5, 5]))
+parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]))
+constants = Constants(("c1", "c2"), (1.0, 1.0))
+inputs = Inputs(drivers, parameters, constants)
+parameterisation(inputs)
+
+
+
+
+# Then call param_dashboard(parameterisation::Function, inputs::Inputs)
+
+function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, slider2) # JSServe sliders
+  fig = Figure(resolution = (1200, 1200))
+  ax3D = Axis3(fig[2,2], xlabel = inputs.drivers.names[1], ylabel = inputs.drivers.names[2])
+  ax_d1 = Axis(fig[3,1], xlabel = inputs.drivers.names[1])
+  ax_d2 = Axis(fig[3,2], xlabel = inputs.drivers.names[2])
+
+  s1 = slider1.value # let's try just 2 for now
+  s2 = slider2.value
+
+  parameters = Observable(inputs.parameters.values)
+
+  #######
+
+
+  # Plot 3D surface of model(drivers, params)
+  x = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, parameterisation, $inputs.parameters.values)[1]) 
+  y = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, parameterisation, $inputs.parameters.values)[2])
+  z = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, parameterisation, $inputs.parameters.values)[3])
+  surface!(ax3D, x, y, z, colormap = Reverse(:Spectral), transparency = true, alpha = 0.2, shading = false)
+
+  # Plot 2D lines of model(drivers, params)
+  x_d1 = collect(range(drivers_limit[1][1], drivers_limit[1][2], 31)) 
+  x_d2 = collect(range(drivers_limit[2][1], drivers_limit[2][2], 31))
+  y_d1 = @lift(d1_vec(x_d1, $(sd_d[2]), model_functions[$m], $parameters)) 
+  y_d2 = @lift(d2_vec($(sd_d[1]), x_d2, model_functions[$m], $parameters))
+  lines!(ax_d1, x_d1, y_d1, color = :red, linewidth = 4)
+  lines!(ax_d2, x_d2, y_d2, color = :blue, linewidth = 4)
+
+  # Plot 3D lines of model(drivers, params)
+  c_d2 = @lift(repeat([$(sd_d[2])], 31)) 
+  c_d1 = @lift(repeat([$(sd_d[1])], 31))
+  lines!(ax3D, x_d1, c_d2, y_d1, color = :red, linewidth = 4) 
+  lines!(ax3D, c_d1, x_d2, y_d2, color = :blue, linewidth = 4)
 end
 
 
-function testf((x, y), (p1, p2), (c1)) # testf(drivers(x, y), parameters(p1, p2), constants(c1))
-    p1*sin(x) + p2*sin(y) + c1
-end
-
-# for param_dashboard, give functions as f(drivers, parameters, constants)
-# and Ranges(drivers, parameters) 
 
 
-# make a function to make it work with param_dashboard(testf, ([-5 5], [-5 5], [-5 5], [-5 5]))
-# for now, let's make it that first argument is x, second argument is y
-# as param_dashboard(Model, Ranges)
-# intial value will be middle of Range
+
+
+
 
 """
     param_dashboard(model_parameters, model_functions, drivers_name, drivers_limit)
