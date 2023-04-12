@@ -98,7 +98,7 @@ function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are define
   return p1*sin(x) + p2*sin(y) + c1 + c2
 end
 
-function parameterisation(x, y, p) # easy to rewrite like this to call mat function
+function Parameterisation(x, y, p) # easy to rewrite like this to call mat function
   c1, c2 = inputs.constants.values[1], inputs.constants.values[2]
   return p[1]*sin(x) + p[2]*sin(y) + c1 + c2
 end
@@ -125,12 +125,26 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, sl
   parameters = Observable(inputs.parameters.values)
 
   #######
+function mat(x, y, r, fun, params)    
+    x = collect(range(x[1], length=r, stop=x[2])) 
+    y = collect(range(y[1], length=r, stop=y[2])) 
+    X = repeat(1:r, inner=r)  
+    Y = repeat(1:r, outer=r) 
+    X2 = repeat(x, inner=r)    
+    Y2 = repeat(y, outer=r) 
+    FMatrix = Matrix(sparse(X, Y, fun.(X2, Y2, repeat([params], r*r))))
+    return x, y, FMatrix
+end
+
+mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, inputs.parameters.values)
+
+
 
 
   # Plot 3D surface of model(drivers, params)
-  x = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, parameterisation, $inputs.parameters.values)[1]) 
-  y = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, parameterisation, $inputs.parameters.values)[2])
-  z = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, parameterisation, $inputs.parameters.values)[3])
+  x = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, $parameters)[1]) 
+  y = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, parameterisation, $parameters)[2])
+  z = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, parameterisation, $parameters)[3])
   surface!(ax3D, x, y, z, colormap = Reverse(:Spectral), transparency = true, alpha = 0.2, shading = false)
 
   # Plot 2D lines of model(drivers, params)
