@@ -109,7 +109,7 @@ constants = Constants(("c1", "c2"), (1.0, 1.0))
 inputs = Inputs(drivers, parameters, constants)
 parameterisation(inputs)
 parameterisation(inputs.drivers.values[1], inputs.drivers.values[2], inputs.parameters.values[1], inputs.parameters.values[1], inputs.constants.values[1], inputs.constants.values[1])
-parameterisation(inputs.drivers.values[1], inputs.drivers.values[2], [inputs.parameters.values[1], inputs.parameters.values[2]])
+Parameterisation(inputs.drivers.values[1], inputs.drivers.values[2], [inputs.parameters.values[1], inputs.parameters.values[2]])
 
 # Then call param_dashboard(parameterisation::Function, inputs::Inputs)
 
@@ -143,8 +143,8 @@ mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, in
 
   # Plot 3D surface of model(drivers, params)
   x = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, $parameters)[1]) 
-  y = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, parameterisation, $parameters)[2])
-  z = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, parameterisation, $parameters)[3])
+  y = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, $parameters)[2])
+  z = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, $parameters)[3])
   surface!(ax3D, x, y, z, colormap = Reverse(:Spectral), transparency = true, alpha = 0.2, shading = false)
 
   # Plot 2D lines of model(drivers, params)
