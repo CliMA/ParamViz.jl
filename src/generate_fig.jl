@@ -115,31 +115,28 @@ Parameterisation(inputs.drivers.values[1], inputs.drivers.values[2], [inputs.par
 
 function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, slider2) # JSServe sliders
   fig = Figure(resolution = (1200, 1200))
-  ax3D = Axis3(fig[2,2], xlabel = inputs.drivers.names[1], ylabel = inputs.drivers.names[2])
-  ax_d1 = Axis(fig[3,1], xlabel = inputs.drivers.names[1])
-  ax_d2 = Axis(fig[3,2], xlabel = inputs.drivers.names[2])
+  ax3D = Axis3(fig[5,2], xlabel = inputs.drivers.names[1], ylabel = inputs.drivers.names[2])
+  ax_d1 = Axis(fig[6,1], xlabel = inputs.drivers.names[1])
+  ax_d2 = Axis(fig[6,2], xlabel = inputs.drivers.names[2])
 
+  #= JSServe sliders
   s1 = slider1.value # let's try just 2 for now
   s2 = slider2.value
+  =#
+
+  # GLMakie slider
+  # For this example we will need 2 driver sliders and 2 parameter sliders
+  s1_d = Slider(fig[1, 1], range = 1:1:3, startvalue = 1) # driver
+  s2_d = Slider(fig[2, 1], range = 1:1:3, startvalue = 1)
+  s1_p = Slider(fig[3, 1], range = 1:1:3, startvalue = 1) # parameter
+  s2_p = Slider(fig[4, 1], range = 1:1:3, startvalue = 1)
+  s1_d_v = s1_d.value
+  s2_d_v = s2_d.value
+  s1_p_v = s1_p.value
+  s2_p_v = s1_p.value
+
 
   parameters = Observable(inputs.parameters.values)
-
-  #######
-function mat(x, y, r, fun, params)    
-    x = collect(range(x[1], length=r, stop=x[2])) 
-    y = collect(range(y[1], length=r, stop=y[2])) 
-    X = repeat(1:r, inner=r)  
-    Y = repeat(1:r, outer=r) 
-    X2 = repeat(x, inner=r)    
-    Y2 = repeat(y, outer=r) 
-    FMatrix = Matrix(sparse(X, Y, fun.(X2, Y2, repeat([params], r*r))))
-    return x, y, FMatrix
-end
-
-mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, inputs.parameters.values)
-
-
-
 
   # Plot 3D surface of model(drivers, params)
   x = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, $parameters)[1]) 
@@ -148,10 +145,10 @@ mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, in
   surface!(ax3D, x, y, z, colormap = Reverse(:Spectral), transparency = true, alpha = 0.2, shading = false)
 
   # Plot 2D lines of model(drivers, params)
-  x_d1 = collect(range(drivers_limit[1][1], drivers_limit[1][2], 31)) 
-  x_d2 = collect(range(drivers_limit[2][1], drivers_limit[2][2], 31))
-  y_d1 = @lift(d1_vec(x_d1, $(sd_d[2]), model_functions[$m], $parameters)) 
-  y_d2 = @lift(d2_vec($(sd_d[1]), x_d2, model_functions[$m], $parameters))
+  x_d1 = collect(range(inputs.drivers.ranges[1][1], inputs.drivers.ranges[1][2], 31)) 
+  x_d2 = collect(range(inputs.drivers.ranges[2][1], inputs.drivers.ranges[2][2], 31))
+  y_d1 = @lift(d1_vec(x_d1, $(sd_d[2]), Parameterisation, $parameters)) 
+  y_d2 = @lift(d2_vec($(sd_d[1]), x_d2, Parameterisation, $parameters))
   lines!(ax_d1, x_d1, y_d1, color = :red, linewidth = 4)
   lines!(ax_d2, x_d2, y_d2, color = :blue, linewidth = 4)
 
