@@ -64,6 +64,25 @@ ga = 1 / r_ae
 # Maybe try another function... 
 
 
+
+
+
+
+###############
+###############
+
+
+
+
+#= deps
+using JSServe, WGLMakie
+using SparseArrays
+using Statistics
+include("src/fun_discretisation.jl")
+
+=#
+
+
 struct Drivers
   names
   values
@@ -113,17 +132,29 @@ Parameterisation(inputs.drivers.values[1], inputs.drivers.values[2], [inputs.par
 
 # Then call param_dashboard(parameterisation::Function, inputs::Inputs)
 
-function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, slider2) # JSServe sliders
+function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, slider2, slider3, slider4) # JSServe sliders
   fig = Figure(resolution = (1200, 1200))
+
+  #= GLMakie layout
   ax3D = Axis3(fig[5,2], xlabel = inputs.drivers.names[1], ylabel = inputs.drivers.names[2])
   ax_d1 = Axis(fig[6,1], xlabel = inputs.drivers.names[1])
   ax_d2 = Axis(fig[6,2], xlabel = inputs.drivers.names[2])
-
-  #= JSServe sliders
-  s1 = slider1.value # let's try just 2 for now
-  s2 = slider2.value
   =#
 
+  # JSServe layout
+  ax3D = Axis3(fig[1,1], xlabel = inputs.drivers.names[1], ylabel = inputs.drivers.names[2])
+  ax_d1 = Axis(fig[2,1], xlabel = inputs.drivers.names[1])
+  ax_d2 = Axis(fig[2,2], xlabel = inputs.drivers.names[2])
+  # 
+  
+  # JSServe sliders
+  s1_d_v = slider1.value 
+  s2_d_v = slider2.value
+  s1_p_v = slider3.value
+  s2_p_v = slider4.value
+  #
+
+  #=
   # GLMakie slider
   # For this example we will need 2 driver sliders and 2 parameter sliders
   s1_d = Slider(fig[1, 1], range = -5:1:5, startvalue = 0) # driver
@@ -134,6 +165,7 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, sl
   s2_d_v = s2_d.value
   s1_p_v = s1_p.value
   s2_p_v = s2_p.value
+  =#
 
   parameters = @lift(($s1_p_v, $s2_p_v)) # parameters values
   x_d1 = collect(range(inputs.drivers.ranges[1][1], inputs.drivers.ranges[1][2], 31)) # min d1 to max d1, 31 steps
@@ -180,8 +212,21 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, sl
     autolimits!(ax_d2)
   end
   
-  # DataInspector(fig)
+  DataInspector(fig)
 
   return fig  
+end
+
+Param_app = App() do 
+  slider1 = Slider(-5:1:5) # driver
+  slider2 = Slider(-5:1:5)
+  slider3 = Slider(-5:1:5) # parameter
+  slider4 = Slider(-5:1:5)
+  fig = param_dashboard(Parameterisation, inputs, slider1, slider2, slider3, slider4)
+  sl1 = DOM.div("x: ", slider1, slider1.value)
+  sl2 = DOM.div("y: ", slider2, slider2.value)
+  sl3 = DOM.div("p1: ", slider3, slider3.value)
+  sl4 = DOM.div("p2: ", slider4, slider4.value)
+  return DOM.div(sl1, sl2, sl3, sl4, fig)
 end
 
