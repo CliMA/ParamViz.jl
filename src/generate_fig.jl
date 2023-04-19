@@ -82,6 +82,35 @@ include("src/fun_discretisation.jl")
 
 =#
 
+struct Drivers
+  names
+  values
+  ranges
+end
+
+struct Parameters
+  names
+  values
+  ranges
+end
+
+struct Constants
+  names
+  values
+end
+
+struct Inputs
+  drivers::Drivers
+  parameters::Parameters
+  constants::Constants
+end
+
+drivers = Drivers(("x", "y"), (1, 1), ([-5, 5], [-5, 5]))
+parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]))
+constants = Constants(("c1", "c2"), (1.0, 1.0))
+inputs = Inputs(drivers, parameters, constants)
+
+
 
 """
     mat(parameterisation::Function, inputs::Inputs, steps::Real)
@@ -138,50 +167,36 @@ function d2_vec(parameterisation::Function, inputs::Inputs, steps::Real) # shoul
   return vecM
 end
 
+
+###########################
+### example ####
+###########################
+
 # Drivers, Parameters, Constants, Inputs struct
-struct Drivers
-  names
-  values
-  ranges
-end
-
-struct Parameters
-  names
-  values
-  ranges
-end
-
-struct Constants
-  names
-  values
-end
-
-struct Inputs
-  drivers::Drivers
-  parameters::Parameters
-  constants::Constants
-end
-
-drivers = Drivers(("x", "y"), (1, 1), ([-5, 5], [-5, 5]))
-parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]))
-constants = Constants(("c1", "c2"), (1.0, 1.0))
-inputs = Inputs(drivers, parameters, constants)
-
 function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are defined like that...
   return p1*sin(x) + p2*sin(y) + c1 + c2
 end
 
+# need to be user defined?
+# user creates the inputs struct
+# then this function to show what are drivers, parameters, constants
 function parameterisation(inputs::Inputs) # method for ParamViz
-    x, y = inputs.drivers.values[1], inputs.drivers.values[2]
+    x, y = inputs.drivers.values[1], inputs.drivers.values[2] 
     p1, p2 = inputs.parameters.values[1], inputs.parameters.values[2]
     c1, c2 = inputs.constants.values[1], inputs.constants.values[2]
-    return p1*sin(x) + p2*sin(y) + c1 + c2
+    return parameterisation(x, y, p1, p2, c1, c2)
 end
 
+# what should be type of args? ::Drivers, ::Parameters, ::Constants 
+# or ::Tuple, ::Tuple, ::Tuple ?
 function parameterisation(drivers, parameters, constants) # method without names and values
-  d, p, c = drivers, parameters, constants # for visibility
-  return p[1]*sin(d[1]) + p[2]*sin(d[2]) + c[1] + c[2]
+  x, y = drivers[1], drivers[2]
+  p1, p2 = parameters[1], parameters[2]
+  c1, c2 = constants[1], constants[2]
+  return parameterisation(x, y, p1, p2, c1, c2)
 end
+
+
 
 #=
 
@@ -198,6 +213,14 @@ Parameterisation(inputs.drivers.values[1], inputs.drivers.values[2], [inputs.par
 
 # Then call param_dashboard(parameterisation::Function, inputs::Inputs)
 
+
+# slider should be a Dict or struct of sliders... with n sliders (n = number of params)
+
+
+"""
+
+
+"""
 function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, slider2, slider3, slider4) # JSServe sliders
   fig = Figure(resolution = (1200, 1200))
 
