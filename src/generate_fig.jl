@@ -83,6 +83,62 @@ include("src/fun_discretisation.jl")
 =#
 
 
+"""
+    mat(parameterisation::Function, inputs::Inputs, steps::Real)
+
+Evaluate the function parameterisation on grid values of drivers x and y. 
+Returns vectors x and y, and a matrix of function output at those points, FMatrix.
+"""
+function mat(parameterisation::Function, inputs::Inputs, steps::Real)
+  # range from min to max for n steps (size = steps) 
+  x = collect(range(inputs.drivers.ranges[1][1], length=steps, stop=inputs.drivers.ranges[1][2]))   
+  y = collect(range(inputs.drivers.ranges[2][1], length=steps, stop=inputs.drivers.ranges[2][2])) 
+  # Grid (size = steps*steps)
+  X = repeat(1:steps, inner=steps)  
+  Y = repeat(1:steps, outer=steps) 
+  # Grid (size = steps*steps)
+  X2 = repeat(x, inner=steps)    
+  Y2 = repeat(y, outer=steps)
+  # args for parameterisation
+  drivers = [(X2[i], Y2[i]) for i in 1:steps*steps]
+  parameters = repeat([inputs.parameters.values], steps*steps)
+  constants = repeat([inputs.parameters.values], steps*steps)
+  # parameterisation output on Grid
+  FMatrix = Matrix(sparse(X, Y, parameterisation.(drivers, parameters, constants)))
+  return x, y, FMatrix
+end
+
+"""
+    d1_vec(parameterisation::Function, inputs::Inputs, steps::Real)
+
+Evaluate the function parameterisation on a line of driver x, with constant y. 
+"""
+function d1_vec(parameterisation::Function, inputs::Inputs, steps::Real) # should y be explicit arg?
+  x = collect(range(inputs.drivers.ranges[1][1], inputs.drivers.ranges[1][2], steps)) # min d1 to max d1, 31 steps
+  # y = repeat([inputs.drivers.ranges[1][2]], steps)
+  drivers = [(x[i], y[i]) for i in 1:steps] 
+  parameters = repeat([inputs.parameters.values], steps)
+  constants = repeat([inputs.parameters.values], steps)
+  vec = parameterisation.(drivers, parameters, constants)
+  return vec
+end
+
+"""
+    d2_vec(parameterisation::Function, inputs::Inputs, steps::Real)
+
+Evaluate the function parameterisation on a line of driver y, with constant x.
+"""
+function d2_vec(parameterisation::Function, inputs::Inputs, steps::Real) # should x be explicit arg?
+  # x = repeat([inputs.drivers.ranges[1][1]], steps) 
+  y = collect(range(inputs.drivers.ranges[2][1], inputs.drivers.ranges[2][2], 31)) # min d2 to max d2, 31 steps
+  drivers = [(x[i], y[i]) for i in 1:steps] 
+  parameters = repeat([inputs.parameters.values], steps)
+  constants = repeat([inputs.parameters.values], steps)
+  vecM = parameterisation.(drivers, parameters, constants)
+  return vecM
+end
+
+# Drivers, Parameters, Constants, Inputs struct
 struct Drivers
   names
   values
@@ -106,29 +162,39 @@ struct Inputs
   constants::Constants
 end
 
-function parameterisation(inputs::Inputs) 
+drivers = Drivers(("x", "y"), (1, 1), ([-5, 5], [-5, 5]))
+parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]))
+constants = Constants(("c1", "c2"), (1.0, 1.0))
+inputs = Inputs(drivers, parameters, constants)
+
+function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are defined like that...
+  return p1*sin(x) + p2*sin(y) + c1 + c2
+end
+
+function parameterisation(inputs::Inputs) # method for ParamViz
     x, y = inputs.drivers.values[1], inputs.drivers.values[2]
     p1, p2 = inputs.parameters.values[1], inputs.parameters.values[2]
     c1, c2 = inputs.constants.values[1], inputs.constants.values[2]
     return p1*sin(x) + p2*sin(y) + c1 + c2
 end
 
-function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are defined like that...
-  return p1*sin(x) + p2*sin(y) + c1 + c2
+function parameterisation(drivers, parameters, constants) # method without names and values
+  d, p, c = drivers, parameters, constants # for visibility
+  return p[1]*sin(d[1]) + p[2]*sin(d[2]) + c[1] + c[2]
 end
 
-function Parameterisation(x, y, p) # easy to rewrite like this to call mat function
+#=
+
+function Parameterisation(x::Real, y::Real, p::Real) # easy to rewrite like this to call mat function
   c1, c2 = inputs.constants.values[1], inputs.constants.values[2]
   return p[1]*sin(x) + p[2]*sin(y) + c1 + c2
 end
 
-drivers = Drivers(("x", "y"), (1, 1), ([-5, 5], [-5, 5]))
-parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]))
-constants = Constants(("c1", "c2"), (1.0, 1.0))
-inputs = Inputs(drivers, parameters, constants)
 parameterisation(inputs)
 parameterisation(inputs.drivers.values[1], inputs.drivers.values[2], inputs.parameters.values[1], inputs.parameters.values[1], inputs.constants.values[1], inputs.constants.values[1])
 Parameterisation(inputs.drivers.values[1], inputs.drivers.values[2], [inputs.parameters.values[1], inputs.parameters.values[2]])
+
+=#
 
 # Then call param_dashboard(parameterisation::Function, inputs::Inputs)
 
