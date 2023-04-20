@@ -221,7 +221,7 @@ Parameterisation(inputs.drivers.values[1], inputs.drivers.values[2], [inputs.par
 
 
 """
-function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, slider2, slider3, slider4) # JSServe sliders
+function param_dashboard(parameterisation::Function, inputs::Inputs, sliders) # JSServe sliders
   fig = Figure(resolution = (1200, 1200))
 
   #= GLMakie layout
@@ -237,15 +237,20 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, sl
   # 
   
   # JSServe sliders
-  s1_d_v = slider1.value 
-  s2_d_v = slider2.value
-  s1_p_v = slider3.value
-  s2_p_v = slider4.value
-  #
+  #s1_d_v = slider1.value 
+  #s2_d_v = slider2.value
+  #s1_p_v = slider3.value
+  #s2_p_v = slider4.value
+
+  s_vals = [sliders[i].value for i in 1:4]   
 
   #=
   # GLMakie slider
   # For this example we will need 2 driver sliders and 2 parameter sliders
+  
+  sliders = [Slider(fig[i, 1], range = -5:1:5, startvalue = 0) for i in 1:4]
+  s_vals = [sliders[i].value for i in 1:4]
+   
   s1_d = Slider(fig[1, 1], range = -5:1:5, startvalue = 0) # driver
   s2_d = Slider(fig[2, 1], range = -5:1:5, startvalue = 0)
   s1_p = Slider(fig[3, 1], range = -5:1:5, startvalue = 0) # parameter
@@ -257,7 +262,11 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, sl
   =#
 
   steps = 30
+  n = 4 # length of sliders
   parameters = @lift(($s1_p_v, $s2_p_v)) # parameters values
+  parameters = @lift($([s_vals[i] for i in 3:n])) # need to fix!!!
+
+
   x_d1 = collect(range(inputs.drivers.ranges[1][1], inputs.drivers.ranges[1][2], steps)) # min d1 to max d1, n steps
   x_d2 = collect(range(inputs.drivers.ranges[2][1], inputs.drivers.ranges[2][2], steps)) # min d2 to max d2, n steps
   c_d1 = @lift(repeat([$s1_d_v], steps)) # constant d1 val, length n
@@ -308,15 +317,10 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, sl
 end
 
 Param_app = App() do 
-  slider1 = Slider(-5:1:5) # driver
-  slider2 = Slider(-5:1:5)
-  slider3 = Slider(-5:1:5) # parameter
-  slider4 = Slider(-5:1:5)
-  fig = param_dashboard(Parameterisation, inputs, slider1, slider2, slider3, slider4)
-  sl1 = DOM.div("x: ", slider1, slider1.value)
-  sl2 = DOM.div("y: ", slider2, slider2.value)
-  sl3 = DOM.div("p1: ", slider3, slider3.value)
-  sl4 = DOM.div("p2: ", slider4, slider4.value)
-  return DOM.div(sl1, sl2, sl3, sl4, fig)
+  n = 4 # length of parameters + 2 (drivers)
+  sliders = [Slider(-5:1:5) for i in 1:n] 
+  fig = param_dashboard(Parameterisation, inputs, sliders)
+  sls = [DOM.div("text i: ", sliders[i], sliders[i].value) for i in 1:n]
+  return DOM.div(sls..., fig)  
 end
 
