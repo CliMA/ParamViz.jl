@@ -82,8 +82,8 @@ include("src/fun_discretisation.jl")
 
 =#
 
-struct Drivers
-  names
+struct Drivers # Need 2 drivers always
+  names # need to be same as declared in function
   values
   ranges
 end
@@ -94,7 +94,7 @@ struct Parameters
   ranges
 end
 
-struct Constants
+struct Constants # should be able to be 0, or have a way to deal with 0
   names
   values
 end
@@ -113,12 +113,12 @@ inputs = Inputs(drivers, parameters, constants)
 
 
 """
-    mat(parameterisation::Function, inputs::Inputs, steps::Real)
+    mat(parameterisation::Function, parameters, steps::Real)
 
 Evaluate the function parameterisation on grid values of drivers x and y. 
 Returns vectors x and y, and a matrix of function output at those points, FMatrix.
 """
-function mat(parameterisation::Function, inputs::Inputs, steps::Real)
+function mat(parameterisation::Function, parameters, steps::Real)
   # range from min to max for n steps (size = steps) 
   x = collect(range(inputs.drivers.ranges[1][1], length=steps, stop=inputs.drivers.ranges[1][2]))   
   y = collect(range(inputs.drivers.ranges[2][1], length=steps, stop=inputs.drivers.ranges[2][2])) 
@@ -130,38 +130,38 @@ function mat(parameterisation::Function, inputs::Inputs, steps::Real)
   Y2 = repeat(y, outer=steps)
   # args for parameterisation
   drivers = [(X2[i], Y2[i]) for i in 1:steps*steps]
-  parameters = repeat([inputs.parameters.values], steps*steps)
-  constants = repeat([inputs.parameters.values], steps*steps)
+  parameters = repeat([parameters], steps*steps)
+  constants = repeat([inputs.constants.values], steps*steps)
   # parameterisation output on Grid
   FMatrix = Matrix(sparse(X, Y, parameterisation.(drivers, parameters, constants)))
   return x, y, FMatrix
 end
 
 """
-    d1_vec(parameterisation::Function, inputs::Inputs, steps::Real)
+    d1_vec(y, parameterisation::Function, parameters, steps::Real)
 
 Evaluate the function parameterisation on a line of driver x, with constant y. 
 """
-function d1_vec(parameterisation::Function, inputs::Inputs, steps::Real) # should y be explicit arg?
-  x = collect(range(inputs.drivers.ranges[1][1], inputs.drivers.ranges[1][2], steps)) # min d1 to max d1, 31 steps
-  # y = repeat([inputs.drivers.ranges[1][2]], steps)
+function d1_vec(y, parameterisation::Function, parameters, steps::Real) 
+  x = collect(range(inputs.drivers.ranges[1][1], inputs.drivers.ranges[1][2], steps)) # min d1 to max d1, n steps
+  y = repeat([y], steps)
   drivers = [(x[i], y[i]) for i in 1:steps] 
-  parameters = repeat([inputs.parameters.values], steps)
+  parameters = repeat([parameters], steps)
   constants = repeat([inputs.parameters.values], steps)
   vec = parameterisation.(drivers, parameters, constants)
   return vec
 end
 
 """
-    d2_vec(parameterisation::Function, inputs::Inputs, steps::Real)
+    d2_vec(x, parameterisation::Function, parameters, steps::Real)
 
 Evaluate the function parameterisation on a line of driver y, with constant x.
 """
-function d2_vec(parameterisation::Function, inputs::Inputs, steps::Real) # should x be explicit arg?
-  # x = repeat([inputs.drivers.ranges[1][1]], steps) 
-  y = collect(range(inputs.drivers.ranges[2][1], inputs.drivers.ranges[2][2], 31)) # min d2 to max d2, 31 steps
+function d2_vec(x, parameterisation::Function, parameters, steps::Real)
+  y = collect(range(inputs.drivers.ranges[2][1], inputs.drivers.ranges[2][2], steps)) # min d2 to max d2, n steps
+  x = repeat([x], steps)
   drivers = [(x[i], y[i]) for i in 1:steps] 
-  parameters = repeat([inputs.parameters.values], steps)
+  parameters = repeat([parameters], steps)
   constants = repeat([inputs.parameters.values], steps)
   vecM = parameterisation.(drivers, parameters, constants)
   return vecM
@@ -177,7 +177,7 @@ function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are define
   return p1*sin(x) + p2*sin(y) + c1 + c2
 end
 
-# need to be user defined?
+# need to be user defined 
 # user creates the inputs struct
 # then this function to show what are drivers, parameters, constants
 function parameterisation(inputs::Inputs) # method for ParamViz
@@ -256,18 +256,19 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, slider1, sl
   s2_p_v = s2_p.value
   =#
 
+  steps = 30
   parameters = @lift(($s1_p_v, $s2_p_v)) # parameters values
-  x_d1 = collect(range(inputs.drivers.ranges[1][1], inputs.drivers.ranges[1][2], 31)) # min d1 to max d1, 31 steps
-  x_d2 = collect(range(inputs.drivers.ranges[2][1], inputs.drivers.ranges[2][2], 31)) # min d2 to max d2, 31 steps
-  c_d1 = @lift(repeat([$s1_d_v], 31)) # constant d1 val, length 31
-  c_d2 = @lift(repeat([$s2_d_v], 31)) # constant d2 val, length 31
-  y_d1 = @lift(d1_vec(x_d1, $s1_d_v, Parameterisation, $parameters)) # function output at constant driver 1
-  y_d2 = @lift(d2_vec($s2_d_v, x_d2, Parameterisation, $parameters)) # function output at constant driver 2
+  x_d1 = collect(range(inputs.drivers.ranges[1][1], inputs.drivers.ranges[1][2], steps)) # min d1 to max d1, n steps
+  x_d2 = collect(range(inputs.drivers.ranges[2][1], inputs.drivers.ranges[2][2], steps)) # min d2 to max d2, n steps
+  c_d1 = @lift(repeat([$s1_d_v], steps)) # constant d1 val, length n
+  c_d2 = @lift(repeat([$s2_d_v], steps)) # constant d2 val, length n
+  y_d1 = @lift(d1_vec($s1_d_v, parameterisation, $parameters, steps)) # function output at constant driver 1
+  y_d2 = @lift(d2_vec($s2_d_v, parameterisation, $parameters, steps)) # function output at constant driver 2
   
   # Plot 3D surface of model(drivers, params)
-  x = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, $parameters)[1]) 
-  y = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, $parameters)[2])
-  z = @lift(mat(inputs.drivers.ranges[1], inputs.drivers.ranges[2], 30, Parameterisation, $parameters)[3])
+  x = @lift(mat(parameterisation, $parameters, steps)[1]) 
+  y = @lift(mat(parameterisation, $parameters, steps)[2])
+  z = @lift(mat(parameterisation, $parameters, steps)[3])
   surface!(ax3D, x, y, z, colormap = Reverse(:Spectral), transparency = true, alpha = 0.2, shading = false)
 
   # Plot 2D lines of model(drivers, params)
