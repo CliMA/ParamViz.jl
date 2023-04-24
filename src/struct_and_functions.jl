@@ -1,20 +1,41 @@
+"""
+  Drivers(names, values, ranges)
+
+A struct to store drivers names, values and ranges
+"""
 struct Drivers # Need 2 drivers always
   names 
   values
   ranges
 end
 
+"""
+  Parameters(names, values, ranges)
+
+A struct to store parameters names, values and ranges
+"""
 struct Parameters
   names
   values
   ranges
 end
 
+"""
+  Constant(names, values, ranges)
+
+A struct to store constants names, values and ranges
+"""
 struct Constants # should be able to be 0, or have a way to deal with 0
   names
   values
 end
 
+"""
+  Inputs(drivers, parameters, constants)
+
+A struct to store drivers, parameters and constants, 
+which are themselves struct storing their names, values and ranges.
+"""
 struct Inputs
   drivers::Drivers
   parameters::Parameters
