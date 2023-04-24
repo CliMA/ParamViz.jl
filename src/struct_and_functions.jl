@@ -43,12 +43,12 @@ struct Inputs
 end
 
 """
-    mat(parameterisation::Function, parameters, steps::Real)
+    mat(parameterisation::Function, inputs::Inputs, parameters, steps::Real)
 
 Evaluate the function parameterisation on grid values of drivers x and y. 
 Returns vectors x and y, and a matrix of function output at those points, FMatrix.
 """
-function mat(parameterisation::Function, parameters, steps::Real)
+function mat(parameterisation::Function, inputs::Inputs, parameters, steps::Real)
   # range from min to max for n steps (size = steps) 
   x = collect(range(inputs.drivers.ranges[1][1], length=steps, stop=inputs.drivers.ranges[1][2]))   
   y = collect(range(inputs.drivers.ranges[2][1], length=steps, stop=inputs.drivers.ranges[2][2])) 
@@ -68,31 +68,31 @@ function mat(parameterisation::Function, parameters, steps::Real)
 end
 
 """
-    d1_vec(y, parameterisation::Function, parameters, steps::Real)
+    d1_vec(y, parameterisation::Function, inputs::Inputs, parameters, steps::Real)
 
 Evaluate the function parameterisation on a line of driver x, with constant y. 
 """
-function d1_vec(y, parameterisation::Function, parameters, steps::Real) 
+function d1_vec(y, parameterisation::Function, inputs::Inputs, parameters, steps::Real) 
   x = collect(range(inputs.drivers.ranges[1][1], inputs.drivers.ranges[1][2], steps)) # min d1 to max d1, n steps
   y = repeat([y], steps)
   drivers = [(x[i], y[i]) for i in 1:steps] 
   parameters = repeat([parameters], steps)
-  constants = repeat([inputs.parameters.values], steps)
+  constants = repeat([inputs.constants.values], steps)
   vec = parameterisation.(drivers, parameters, constants)
   return vec
 end
 
 """
-    d2_vec(x, parameterisation::Function, parameters, steps::Real)
+    d2_vec(x, parameterisation::Function, inputs::Inputs, parameters, steps::Real)
 
 Evaluate the function parameterisation on a line of driver y, with constant x.
 """
-function d2_vec(x, parameterisation::Function, parameters, steps::Real)
+function d2_vec(x, parameterisation::Function, inputs::Inputs, parameters, steps::Real)
   y = collect(range(inputs.drivers.ranges[2][1], inputs.drivers.ranges[2][2], steps)) # min d2 to max d2, n steps
   x = repeat([x], steps)
   drivers = [(x[i], y[i]) for i in 1:steps] 
   parameters = repeat([parameters], steps)
-  constants = repeat([inputs.parameters.values], steps)
+  constants = repeat([inputs.constants.values], steps)
   vecM = parameterisation.(drivers, parameters, constants)
   return vecM
 end

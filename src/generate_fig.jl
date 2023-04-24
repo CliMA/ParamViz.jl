@@ -24,13 +24,13 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, sliders)
   x_d2 = collect(range(inputs.drivers.ranges[2][1], inputs.drivers.ranges[2][2], steps)) # min d2 to max d2, n steps
   c_d1 = @lift(repeat([$(s_vals[1])], steps)) # constant d1 val, length n
   c_d2 = @lift(repeat([$(s_vals[2])], steps)) # constant d2 val, length n
-  y_d1 = @lift(d1_vec($(s_vals[1]), parameterisation, $parameters, steps)) # function output at constant driver 1
-  y_d2 = @lift(d2_vec($(s_vals[2]), parameterisation, $parameters, steps)) # function output at constant driver 2
+  y_d1 = @lift(d1_vec($(s_vals[1]), parameterisation, inputs, $parameters, steps)) # function output at constant driver 1
+  y_d2 = @lift(d2_vec($(s_vals[2]), parameterisation, inputs, $parameters, steps)) # function output at constant driver 2
   
   # Plot 3D surface of model(drivers, params)
-  x = @lift(mat(parameterisation, $parameters, steps)[1]) 
-  y = @lift(mat(parameterisation, $parameters, steps)[2])
-  z = @lift(mat(parameterisation, $parameters, steps)[3])
+  x = @lift(mat(parameterisation, inputs, $parameters, steps)[1]) 
+  y = @lift(mat(parameterisation, inputs, $parameters, steps)[2])
+  z = @lift(mat(parameterisation, inputs, $parameters, steps)[3])
   surface!(ax3D, x, y, z, colormap = Reverse(:Spectral), transparency = true, alpha = 0.2, shading = false)
 
   # Plot 2D lines of model(drivers, params)
