@@ -4,7 +4,7 @@
 ## Install ParamViz.jl: (unregistered for now)
 ```jl
 julia> ]
-pkg> add https://github.com/CliMA/ParamViz.jl/tree/newformat 
+pkg> add https://github.com/CliMA/ParamViz.jl
 ```
 ## Load package:
 ```jl
