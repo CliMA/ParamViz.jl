@@ -1,33 +1,43 @@
-test
-To test locally:
-first, clone the repo
+# ParamViz.jl - dynamic parameterisation web app 
+![ParamViz_demo_0 1](https://user-images.githubusercontent.com/22160257/236900115-e0ee8d2b-fc35-419c-830b-51ea49d2bd17.gif)
 
-```ubuntu
-$ git clone https://github.com/CliMA/ParamViz.jl.git
-```
-
-then start a julia project in that repo, install deps
-
-```ubuntu
-$ cd ParamViz.jl
-/ParamViz.jl$ julia --project
-```
-
+## Install ParamViz.jl: (unregistered for now)
 ```jl
 julia> ]
-(ParamViz) pkg> instantiate
+pkg> add https://github.com/CliMA/ParamViz.jl/tree/newformat 
 ```
-
+## Load package:
 ```jl
 julia> using ParamViz
-julia> using ClimaLSM, ClimaLSM.Soil.Biogeochemistry
-julia> model_parameters = SoilCO2ModelParameters
-julia> model_functions = Dict("CO2 production" => (d1, d2, p) -> microbe_source(d1, d2, 5.0, p),
-                       "CO2 diffusivity" => co2_diffusivity)
-julia> drivers_name = ["T_soil", "M_soil"]
-julia> drivers_limit = ([273, 303], [0.0, 0.5])
-julia> param_dashboard(model_parameters, model_functions, drivers_name, drivers_limit)
 ```
+## Create structs:
+```jl
+julia> drivers = Drivers(("x", "y"), (1, 1), ([-5, 5], [-5, 5]))
+julia> parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]))
+julia> constants = Constants(("c1", "c2"), (1.0, 1.0))
+julia> inputs = Inputs(drivers, parameters, constants)
+```
+## Create methods:
+```jl
+julia> function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are defined like that...
+  return p1*sin(x) + p2*sin(y) + c1 + c2
+end
 
-then open this URL in your browser 
-http://localhost:9384/browser-display
+julia> function parameterisation(inputs::Inputs) # method for ParamViz
+    x, y = inputs.drivers.values[1], inputs.drivers.values[2] 
+    p1, p2 = inputs.parameters.values[1], inputs.parameters.values[2]
+    c1, c2 = inputs.constants.values[1], inputs.constants.values[2]
+    return parameterisation(x, y, p1, p2, c1, c2)
+end
+
+julia> function parameterisation(drivers, parameters, constants) # method without names and values
+  x, y = drivers[1], drivers[2]
+  p1, p2 = parameters[1], parameters[2]
+  c1, c2 = constants[1], constants[2]
+  return parameterisation(x, y, p1, p2, c1, c2)
+end
+```
+## Call webapp:
+```jl
+julia> webapp(parameters, parameterisation, inputs)
+```
