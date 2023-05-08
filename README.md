@@ -1,3 +1,6 @@
+# ParamViz.jl - dynamic parameterisation web app 
+![ParamViz_demo_0 1](https://user-images.githubusercontent.com/22160257/236900115-e0ee8d2b-fc35-419c-830b-51ea49d2bd17.gif)
+
 ## Install ParamViz.jl: (unregistered for now)
 ```jl
 julia> ]
