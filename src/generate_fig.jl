@@ -46,7 +46,7 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, sliders)
   return fig  
 end
 
-function webapp()
+function webapp(parameters, parameterisation, inputs)
   Param_app = App() do 
     n = length(parameters.values)+2 
     sliders = [Slider(-5:1:5) for i in 1:n] |> Tuple
