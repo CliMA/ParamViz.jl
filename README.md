@@ -1,20 +1,20 @@
-## Install ParamViz.jl, unregistered for now
+## Install ParamViz.jl: (unregistered for now)
 ```jl
 julia> ]
 pkg> add https://github.com/CliMA/ParamViz.jl/tree/newformat 
 ```
-## Load package
+## Load package:
 ```jl
 julia> using ParamViz
 ```
-## For this demo, let's create these structs:
+## Create structs:
 ```jl
 julia> drivers = Drivers(("x", "y"), (1, 1), ([-5, 5], [-5, 5]))
 julia> parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]))
 julia> constants = Constants(("c1", "c2"), (1.0, 1.0))
 julia> inputs = Inputs(drivers, parameters, constants)
 ```
-## For this demo, let's create these functions:
+## Create methods:
 ```jl
 julia> function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are defined like that...
   return p1*sin(x) + p2*sin(y) + c1 + c2
@@ -33,4 +33,8 @@ julia> function parameterisation(drivers, parameters, constants) # method withou
   c1, c2 = constants[1], constants[2]
   return parameterisation(x, y, p1, p2, c1, c2)
 end
+```
+## Call webapp:
+```jl
+julia> webapp(parameters, parameterisation, inputs)
 ```
