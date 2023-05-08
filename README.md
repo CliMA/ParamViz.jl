@@ -1,6 +1,9 @@
 drivers = Drivers(("x", "y"), (1, 1), ([-5, 5], [-5, 5]))
+
 parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]))
+
 constants = Constants(("c1", "c2"), (1.0, 1.0))
+
 inputs = Inputs(drivers, parameters, constants)
 
 function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are defined like that...
