@@ -46,11 +46,13 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, sliders)
   return fig  
 end
 
-Param_app = App() do 
-  n = length(parameters.values)+2 
-  sliders = [Slider(-5:1:5) for i in 1:n] |> Tuple
-  fig = param_dashboard(parameterisation, inputs, sliders)
-  sls = [DOM.div("text i: ", sliders[i], sliders[i].value) for i in 1:n]
-  return DOM.div(sls..., fig)  
+function webapp()
+  Param_app = App() do 
+    n = length(parameters.values)+2 
+    sliders = [Slider(-5:1:5) for i in 1:n] |> Tuple
+    fig = param_dashboard(parameterisation, inputs, sliders)
+    sls = [DOM.div("text i: ", sliders[i], sliders[i].value) for i in 1:n]
+    return DOM.div(sls..., fig)  
+  end
+  return Param_app
 end
-

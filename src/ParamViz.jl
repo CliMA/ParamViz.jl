@@ -11,5 +11,6 @@ export mat, d1_vec, d2_vec # functions
 
 include("generate_fig.jl")
 export param_dashboard
+export webapp
 
 end 
