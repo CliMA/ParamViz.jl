@@ -41,3 +41,5 @@ end
 ```jl
 julia> webapp(parameters, parameterisation, inputs)
 ```
+## Open app in your browser: 
+Open your favorite browser and go to the URL http://localhost:9384/browser-display
