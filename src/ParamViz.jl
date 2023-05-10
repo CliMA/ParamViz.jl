@@ -6,7 +6,7 @@ using SparseArrays
 using Statistics
 
 include("struct_and_functions.jl")
-export Drivers, Parameters, Constants, Inputs # struct
+export Drivers, Parameters, Constants, Inputs, Output # struct
 export mat, d1_vec, d2_vec # functions
 
 include("generate_fig.jl")

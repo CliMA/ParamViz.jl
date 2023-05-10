@@ -43,6 +43,16 @@ struct Inputs
 end
 
 """
+  Output(name, range)
+
+A struct to store output name and range.
+"""
+struct Output
+  name
+  range
+end
+
+"""
     mat(parameterisation::Function, inputs::Inputs, parameters, steps::Real)
 
 Evaluate the function parameterisation on grid values of drivers x and y. 

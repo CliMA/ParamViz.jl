@@ -16,6 +16,7 @@ julia> drivers = Drivers(("x", "y"), (1, 1), ([-5, 5], [-5, 5]))
 julia> parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]))
 julia> constants = Constants(("c1", "c2"), (1.0, 1.0))
 julia> inputs = Inputs(drivers, parameters, constants)
+julia> output = Output("output", [-12, 12])
 ```
 ## Create methods:
 ```jl
@@ -39,12 +40,7 @@ end
 ```
 ## Call webapp:
 ```jl
-julia> webapp(parameters, parameterisation, inputs)
+julia> webapp(parameterisation, inputs, output)
 ```
 ## Open app in your browser: 
 Open your favorite browser and go to the URL http://localhost:9384/browser-display
-## TO DO list: 
-- [ ] y-axis limit set somewhere 
-- [ ] text i: driver or parameter name
-- [ ] set axis labels and size 
-- [ ] set sliders limit to range
