@@ -22,10 +22,10 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
 
   x_d1 = collect(range(inputs.drivers.ranges[1][1], inputs.drivers.ranges[1][2], steps)) # min d1 to max d1, n steps
   x_d2 = collect(range(inputs.drivers.ranges[2][1], inputs.drivers.ranges[2][2], steps)) # min d2 to max d2, n steps
-  c_d1 = @lift(repeat([$(drivers_vals[1])], steps)) # constant d1 val, length n
-  c_d2 = @lift(repeat([$(drivers_vals[2])], steps)) # constant d2 val, length n
-  y_d1 = @lift(d1_vec($(drivers_vals[1]), parameterisation, inputs, $parameters, steps)) # function output at constant driver 1
-  y_d2 = @lift(d2_vec($(drivers_vals[2]), parameterisation, inputs, $parameters, steps)) # function output at constant driver 2
+  c_d1 = @lift(repeat([$(drivers_vals[2])], steps)) # constant d1 val, length n
+  c_d2 = @lift(repeat([$(drivers_vals[1])], steps)) # constant d2 val, length n
+  y_d1 = @lift(d1_vec($(drivers_vals[2]), parameterisation, inputs, $parameters, steps)) # function output at constant driver 1
+  y_d2 = @lift(d2_vec($(drivers_vals[1]), parameterisation, inputs, $parameters, steps)) # function output at constant driver 2
   
   # Plot 3D surface of model(drivers, params)
   x = @lift(mat(parameterisation, inputs, $parameters, steps)[1]) 
@@ -59,3 +59,6 @@ function webapp(parameterisation, inputs, output)
   end
   return Param_app
 end
+
+
+
