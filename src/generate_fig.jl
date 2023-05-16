@@ -31,7 +31,7 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
   x = @lift(mat(parameterisation, inputs, $parameters, steps)[1]) 
   y = @lift(mat(parameterisation, inputs, $parameters, steps)[2])
   z = @lift(mat(parameterisation, inputs, $parameters, steps)[3])
-  surface!(ax3D, x, y, z, colormap = Reverse(:Spectral), transparency = true, alpha = 0.2, shading = false)
+  surface!(ax3D, x, y, z, colormap = Reverse((:Spectral, 0.6),), transparency = true, alpha = 0.2, shading = false)
 
   # Plot 2D lines of model(drivers, params)
   lines!(ax_d1, x_d1, y_d1, color = :red, linewidth = 4)
@@ -53,8 +53,8 @@ function webapp(parameterisation, inputs, output)
     drivers_sliders = [Slider(range(inputs.drivers.ranges[i][1], inputs.drivers.ranges[i][2], 10)) for i in 1:n_drivers] |> Tuple
     parameters_sliders = [Slider(range(inputs.parameters.ranges[i][1], inputs.parameters.ranges[i][2], 10)) for i in 1:n_parameters] |> Tuple
     fig = param_dashboard(parameterisation, inputs, drivers_sliders, parameters_sliders, output)
-    drivers_sliders_UI = [DOM.div(string(inputs.drivers.names[i], " = "), drivers_sliders[i], drivers_sliders[i].value) for i in 1:n_drivers]
-    parameters_sliders_UI = [DOM.div(string(inputs.parameters.names[i], " = "), parameters_sliders[i], parameters_sliders[i].value) for i in 1:n_parameters]
+    drivers_sliders_UI = [DOM.div(string(inputs.drivers.names[i], " = "), drivers_sliders[i], @lift(round($(drivers_sliders[i].value), sigdigits = 2))) for i in 1:n_drivers]
+    parameters_sliders_UI = [DOM.div(string(inputs.parameters.names[i], " = "), parameters_sliders[i], @lift(round($(parameters_sliders[i].value), sigdigits = 2))) for i in 1:n_parameters]
     return DOM.div(drivers_sliders_UI..., parameters_sliders_UI..., fig)  
   end
   return Param_app
