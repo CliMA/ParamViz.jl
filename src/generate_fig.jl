@@ -34,7 +34,8 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
   y = @lift(mat(parameterisation, inputs, $parameters, steps)[2])
   z = @lift(mat(parameterisation, inputs, $parameters, steps)[3])
   surface!(ax3D, x, y, z, colormap = Reverse((:Spectral, 0.8),), transparency = true, alpha = 0.2, shading = false, colorrange = output.range) 
-  Colorbar(fig[1, 1:2][1, 2], colormap = Reverse(:Spectral), limits = output.range, label = output.name)
+  cb = Colorbar(fig[1, 1:2][1, 2], colormap = Reverse(:Spectral), limits = output.range, label = output.name)
+  cb.alignmode = Mixed(right = 0)
 
   # Plot 2D lines of model(drivers, params)
   lines!(ax_d1, x_d1, y_d1, color = :red, linewidth = 4)
