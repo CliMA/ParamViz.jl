@@ -5,7 +5,7 @@ Generates a dashboard of a parameterisation(drivers, parameters, constants) func
 where the user can interact with driver and parameter values via sliders. 
 """
 function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sliders, parameters_sliders, output) 
-  fig = Figure(resolution = (1200, 1200))
+  fig = Figure(resolution = (500, 500))
 
   # JSServe layout
   ax3D = Axis3(fig[1,1:2][1,1], xlabel = inputs.drivers.names[1], ylabel = inputs.drivers.names[2], zlabel = output.name); zlims!(ax3D, output.range)
@@ -46,7 +46,7 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
 
   val = @lift(parameterisation($drivers, $parameters, constants))
   point3D = @lift(Vec3f.($(drivers_vals[1]), $(drivers_vals[2]), $val))
-  scatter!(ax3D, point3D, color = val, markersize = 40, colormap = Reverse(:Spectral), colorrange = output.range,
+  scatter!(ax3D, point3D, color = val, markersize = 20, colormap = Reverse(:Spectral), colorrange = output.range,
           strokewidth = 10, strokecolor = :black) # stroke not supported in WGLMakie?
 
   DataInspector(fig)
