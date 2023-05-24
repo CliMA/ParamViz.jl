@@ -5,7 +5,7 @@ Generates a dashboard of a parameterisation(drivers, parameters, constants) func
 where the user can interact with driver and parameter values via sliders. 
 """
 function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sliders, parameters_sliders, output) 
-  fig = Figure(resolution = (500, 500))
+  fig = Figure(resolution = (800, 800))
 
   # JSServe layout
   ax3D = Axis3(fig[1,1:2][1,1], xlabel = inputs.drivers.names[1], ylabel = inputs.drivers.names[2], zlabel = output.name); zlims!(ax3D, output.range)
