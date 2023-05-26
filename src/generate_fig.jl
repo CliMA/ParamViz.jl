@@ -59,13 +59,20 @@ function webapp(parameterisation, inputs, output)
   Param_app = App() do 
     n_drivers = 2  
     n_parameters = length(inputs.parameters.values)
-    drivers_sliders = [JSServe.TailwindDashboard.Slider(inputs.drivers.names[i], range(inputs.drivers.ranges[i][1], inputs.drivers.ranges[i][2], 10), value = 5) for i in 1:n_drivers] |> Tuple
-    parameters_sliders = [Slider(range(inputs.parameters.ranges[i][1], inputs.parameters.ranges[i][2], 10)) for i in 1:n_parameters] |> Tuple
+    drivers_range = [range(inputs.drivers.ranges[i][1], inputs.drivers.ranges[i][2], 12) for i in 1:n_drivers]
+    parameters_range = [range(inputs.parameters.ranges[i][1], inputs.parameters.ranges[i][2], 12) for i in 1:n_parameters]
+    drivers_sliders = [JSServe.TailwindDashboard.Slider(inputs.drivers.names[i], drivers_range[i], value = drivers_range[i][6]) for i in 1:n_drivers] |> Tuple
+    parameters_sliders = [JSServe.TailwindDashboard.Slider(inputs.parameters.names[i], parameters_range[i], value = parameters_range[i][6]) for i in 1:n_parameters] |> Tuple
     fig, out = param_dashboard(parameterisation, inputs, drivers_sliders, parameters_sliders, output)
-    drivers_sliders_UI = [DOM.div(string(inputs.drivers.names[i], " = "), drivers_sliders[i], @lift(round($(drivers_sliders[i].value), sigdigits = 2))) for i in 1:n_drivers]
-    parameters_sliders_UI = [DOM.div(string(inputs.parameters.names[i], " = "), parameters_sliders[i], @lift(round($(parameters_sliders[i].value), sigdigits = 2))) for i in 1:n_parameters]
     output_value = DOM.div(output.name, " = ", @lift(round($(out), sigdigits = 2)))
-    return DOM.div(output_value, drivers_sliders_UI..., parameters_sliders_UI..., fig)  
+    return DOM.div(
+                   JSServe.TailwindDashboard.Card(
+                                                  JSServe.TailwindDashboard.FlexRow(
+                     JSServe.TailwindDashboard.Card(
+                                                    JSServe.TailwindDashboard.FlexCol(output_value, drivers_sliders..., parameters_sliders...)
+                                                   ), fig)      
+                                                 )
+                  )
   end
   return Param_app
 end
