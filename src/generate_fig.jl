@@ -59,13 +59,13 @@ function webapp(parameterisation, inputs, output)
   Param_app = App() do 
     n_drivers = 2  
     n_parameters = length(inputs.parameters.values)
-    drivers_sliders = [Slider(range(inputs.drivers.ranges[i][1], inputs.drivers.ranges[i][2], 10)) for i in 1:n_drivers] |> Tuple
+    drivers_sliders = [JSServe.TailwindDashboard.Slider(inputs.drivers.names[i], range(inputs.drivers.ranges[i][1], inputs.drivers.ranges[i][2], 10), value = 5) for i in 1:n_drivers] |> Tuple
     parameters_sliders = [Slider(range(inputs.parameters.ranges[i][1], inputs.parameters.ranges[i][2], 10)) for i in 1:n_parameters] |> Tuple
     fig, out = param_dashboard(parameterisation, inputs, drivers_sliders, parameters_sliders, output)
     drivers_sliders_UI = [DOM.div(string(inputs.drivers.names[i], " = "), drivers_sliders[i], @lift(round($(drivers_sliders[i].value), sigdigits = 2))) for i in 1:n_drivers]
     parameters_sliders_UI = [DOM.div(string(inputs.parameters.names[i], " = "), parameters_sliders[i], @lift(round($(parameters_sliders[i].value), sigdigits = 2))) for i in 1:n_parameters]
-    param_value = DOM.div(output.name, " = ", @lift(round($(out), sigdigits = 2)))
-    return DOM.div(drivers_sliders_UI..., parameters_sliders_UI..., param_value, fig)  
+    output_value = DOM.div(output.name, " = ", @lift(round($(out), sigdigits = 2)))
+    return DOM.div(output_value, drivers_sliders_UI..., parameters_sliders_UI..., fig)  
   end
   return Param_app
 end
