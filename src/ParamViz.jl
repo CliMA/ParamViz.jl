@@ -4,6 +4,7 @@ using WGLMakie
 using JSServe
 using SparseArrays
 using Statistics
+using UnicodeFun
 
 include("struct_and_functions.jl")
 export Drivers, Parameters, Constants, Inputs, Output # struct
