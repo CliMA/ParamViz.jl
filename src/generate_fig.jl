@@ -59,8 +59,8 @@ function webapp(parameterisation, inputs, output)
   Param_app = App() do 
     n_drivers = 2  
     n_parameters = length(inputs.parameters.values)
-    drivers_range = [round.(range(inputs.drivers.ranges[i][1], inputs.drivers.ranges[i][2], 12)) for i in 1:n_drivers]
-    parameters_range = [round.(range(inputs.parameters.ranges[i][1], inputs.parameters.ranges[i][2], 12)) for i in 1:n_parameters]
+    drivers_range = [round.(range(inputs.drivers.ranges[i][1], inputs.drivers.ranges[i][2], 12), sigdigits = 2) for i in 1:n_drivers]
+    parameters_range = [round.(range(inputs.parameters.ranges[i][1], inputs.parameters.ranges[i][2], 12), sigdigits = 2) for i in 1:n_parameters]
     drivers_sliders = [JSServe.TailwindDashboard.Slider(inputs.drivers.names[i], drivers_range[i], value = drivers_range[i][6]) for i in 1:n_drivers] |> Tuple
     parameters_sliders = [JSServe.TailwindDashboard.Slider(inputs.parameters.names[i], parameters_range[i], value = parameters_range[i][6]) for i in 1:n_parameters] |> Tuple
     fig, out = param_dashboard(parameterisation, inputs, drivers_sliders, parameters_sliders, output)
