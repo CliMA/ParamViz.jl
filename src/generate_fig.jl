@@ -67,7 +67,7 @@ function webapp(parameterisation, inputs, output)
     output_value = DOM.div(output.name, " = ", @lift(round($(out), sigdigits = 2)))
     return DOM.div(
                    JSServe.TailwindDashboard.Card(
-                                                  JSServe.TailwindDashboard.FlexRow(
+                                                  JSServe.TailwindDashboard.FlexCol(
                      JSServe.TailwindDashboard.Card(
                                                     JSServe.TailwindDashboard.FlexCol(output_value, drivers_sliders..., parameters_sliders...)
                                                    ), fig)      
