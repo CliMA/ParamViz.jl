@@ -28,7 +28,11 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
   c_d2 = @lift(repeat([$(drivers_vals[1])], steps)) # constant d2 val, length n
   y_d1 = @lift(d1_vec($(drivers_vals[2]), parameterisation, inputs, $parameters, steps)) # function output at constant driver 1
   y_d2 = @lift(d2_vec($(drivers_vals[1]), parameterisation, inputs, $parameters, steps)) # function output at constant driver 2
-  
+  val = @lift(parameterisation($drivers, $parameters, constants))
+  point3D = @lift(Vec3f.($(drivers_vals[1]), $(drivers_vals[2]), $val))
+  point2D_ax1 = @lift(Vec2f.($(drivers_vals[1]), $val))
+  point2D_ax2 = @lift(Vec2f.($(drivers_vals[2]), $val))
+
   # Plot 3D surface of model(drivers, params)
   x = @lift(mat(parameterisation, inputs, $parameters, steps)[1]) 
   y = @lift(mat(parameterisation, inputs, $parameters, steps)[2])
@@ -40,14 +44,13 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
   # Plot 2D lines of model(drivers, params)
   lines!(ax_d1, x_d1, y_d1, color = :red, linewidth = 4)
   lines!(ax_d2, x_d2, y_d2, color = :blue, linewidth = 4)
+  scatter!(ax_d1, point2D_ax1, color = :black, markersize = 20)
+  scatter!(ax_d2, point2D_ax2, color = :black, markersize = 20)
 
   # Plot 3D lines of model(drivers, params)
   lines!(ax3D, x_d1, c_d1, y_d1, color = :red, linewidth = 4) 
   lines!(ax3D, c_d2, x_d2, y_d2, color = :blue, linewidth = 4)
-
-  val = @lift(parameterisation($drivers, $parameters, constants))
-  point3D = @lift(Vec3f.($(drivers_vals[1]), $(drivers_vals[2]), $val))
-  scatter!(ax3D, point3D, color = val, markersize = 20, colormap = Reverse(:Spectral), colorrange = output.range,
+  scatter!(ax3D, point3D, color = :black, markersize = 20, colormap = Reverse(:Spectral), colorrange = output.range,
           strokewidth = 10, strokecolor = :black) # stroke not supported in WGLMakie?
 
   DataInspector(fig)
@@ -64,14 +67,19 @@ function webapp(parameterisation, inputs, output)
     drivers_sliders = [JSServe.TailwindDashboard.Slider(inputs.drivers.names[i], drivers_range[i], value = drivers_range[i][6]) for i in 1:n_drivers] |> Tuple
     parameters_sliders = [JSServe.TailwindDashboard.Slider(inputs.parameters.names[i], parameters_range[i], value = parameters_range[i][6]) for i in 1:n_parameters] |> Tuple
     fig, out = param_dashboard(parameterisation, inputs, drivers_sliders, parameters_sliders, output)
-    output_value = DOM.div(output.name, " = ", @lift(round($(out), sigdigits = 2)))
+    output_value = DOM.div(output.name, " = ", @lift(round($(out), sigdigits = 2)); style="font-size: 20px; font-weight: bold")
+    drivers_label = DOM.div("Drivers:"; style="font-size: 16px; font-weight: bold")
+    parameters_label = DOM.div("Parameters:"; style="font-size: 16px; font-weight: bold")
     return DOM.div(
                    JSServe.TailwindDashboard.Card(
-                                                  JSServe.TailwindDashboard.FlexCol(
-                     JSServe.TailwindDashboard.Card(
-                                                    JSServe.TailwindDashboard.FlexCol(output_value, drivers_sliders..., parameters_sliders...)
-                                                   ), fig)      
-                                                 )
+                   JSServe.TailwindDashboard.FlexCol(
+                                                     JSServe.TailwindDashboard.Card(output_value; class="container mx-auto"),
+                                                     JSServe.TailwindDashboard.FlexRow(
+                                                                                       JSServe.TailwindDashboard.Card(JSServe.TailwindDashboard.FlexCol(parameters_label, parameters_sliders...)),
+                                                                                       JSServe.TailwindDashboard.Card(JSServe.TailwindDashboard.FlexCol(drivers_label, drivers_sliders...))
+                                                                                      ),
+                                                     fig)      
+                                                    )
                   )
   end
   return Param_app
