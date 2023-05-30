@@ -1,5 +1,5 @@
 # ParamViz.jl - dynamic parameterisation web app 
-![ParamViz_demo_0 3](https://github.com/CliMA/ParamViz.jl/assets/22160257/fb67fa93-070b-4811-8cee-26fbe8446fd6)
+![ParamViz_1 0](https://github.com/CliMA/ParamViz.jl/assets/22160257/895db9ad-b736-4219-98e1-81ca4665dfee)
 
 ## Install ParamViz.jl: (unregistered for now)
 ```jl
