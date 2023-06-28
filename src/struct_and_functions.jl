@@ -1,23 +1,25 @@
 """
-  Drivers(names, values, ranges)
+  Drivers(names, values, ranges, scalers)
 
-A struct to store drivers names, values and ranges
+A struct to store drivers names, values, ranges and scalers
 """
 struct Drivers # Need 2 drivers always
   names 
   values
   ranges
+  scalers
 end
 
 """
-  Parameters(names, values, ranges)
+  Parameters(names, values, ranges, scaler)
 
-A struct to store parameters names, values and ranges
+A struct to store parameters names, values, ranges and scalers
 """
 struct Parameters
   names
   values
   ranges
+  scalers
 end
 
 """
@@ -43,13 +45,14 @@ struct Inputs
 end
 
 """
-  Output(name, range)
+  Output(name, range, scaler)
 
-A struct to store output name and range.
+A struct to store output name, range and scaler.
 """
 struct Output
   name
   range
+  scaler
 end
 
 """
