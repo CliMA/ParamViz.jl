@@ -18,7 +18,7 @@ julia> constants = Constants(("c1", "c2"), (1.0, 1.0))
 julia> inputs = Inputs(drivers, parameters, constants)
 julia> output = Output("output", [-12, 12])
 ```
-## Create method: (note, it will be the 3rd method, 2 are internally defined)
+## Create method:
 ```jl
 julia> function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are defined like that...
   return p1*sin(x) + p2*sin(y) + c1 + c2
