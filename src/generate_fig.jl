@@ -4,7 +4,7 @@
 Generates a dashboard of a parameterisation(drivers, parameters, constants) function,
 where the user can interact with driver and parameter values via sliders. 
 """
-function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sliders, parameters_sliders, output) 
+function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sliders, parameters_sliders, output)
   fig = Figure(resolution = (800, 800))
 
   # JSServe layout

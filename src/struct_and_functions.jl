@@ -7,7 +7,7 @@ struct Drivers # Need 2 drivers always
   names 
   values
   ranges
-  scalers
+  #scalers
 end
 
 """
@@ -19,7 +19,7 @@ struct Parameters
   names
   values
   ranges
-  scalers
+  #scalers
 end
 
 """
@@ -52,7 +52,7 @@ A struct to store output name, range and scaler.
 struct Output
   name
   range
-  scaler
+  #scaler
 end
 
 """
@@ -109,3 +109,13 @@ function d2_vec(x, parameterisation::Function, inputs::Inputs, parameters, steps
   vecM = parameterisation.(drivers, parameters, constants)
   return vecM
 end
+
+# methods for parameterisation
+function parameterisation(inputs::Inputs)
+  return parameterisation((inputs.drivers.values..., inputs.parameters.values..., inputs.constants.values...)...)
+end
+
+function parameterisation(drivers, parameters, constants)
+  return parameterisation((drivers..., parameters..., constants...)...)
+end
+
