@@ -12,5 +12,6 @@ UnicodeFun = "1cfade01-22cf-5700-b092-accc4b62d6e1"
 WGLMakie = "276b4fcb-3e11-5398-bf8b-a0c2d153d008"
 
 [compat]
+JSServe = "2.0.6"
 WGLMakie = "0.8.5"
 julia = "1.8"
