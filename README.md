@@ -18,24 +18,10 @@ julia> constants = Constants(("c1", "c2"), (1.0, 1.0))
 julia> inputs = Inputs(drivers, parameters, constants)
 julia> output = Output("output", [-12, 12])
 ```
-## Create methods:
+## Create method: (note, it will be the 3rd method, 2 are internally defined)
 ```jl
 julia> function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are defined like that...
   return p1*sin(x) + p2*sin(y) + c1 + c2
-end
-
-julia> function parameterisation(inputs::Inputs) # method for ParamViz
-    x, y = inputs.drivers.values[1], inputs.drivers.values[2] 
-    p1, p2 = inputs.parameters.values[1], inputs.parameters.values[2]
-    c1, c2 = inputs.constants.values[1], inputs.constants.values[2]
-    return parameterisation(x, y, p1, p2, c1, c2)
-end
-
-julia> function parameterisation(drivers, parameters, constants) # method without names and values
-  x, y = drivers[1], drivers[2]
-  p1, p2 = parameters[1], parameters[2]
-  c1, c2 = constants[1], constants[2]
-  return parameterisation(x, y, p1, p2, c1, c2)
 end
 ```
 ## Call webapp:
