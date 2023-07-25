@@ -7,7 +7,7 @@ struct Drivers # Need 2 drivers always
   names 
   values
   ranges
-  #scalers
+  scalers
 end
 
 """
@@ -19,7 +19,7 @@ struct Parameters
   names
   values
   ranges
-  #scalers
+  scalers
 end
 
 """
@@ -52,7 +52,7 @@ A struct to store output name, range and scaler.
 struct Output
   name
   range
-  #scaler
+  scaler
 end
 
 """
