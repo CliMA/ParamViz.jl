@@ -37,7 +37,7 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
   x = @lift(mat(parameterisation, inputs, $parameters, steps)[1].*inputs.drivers.scalers[1]) 
   y = @lift(mat(parameterisation, inputs, $parameters, steps)[2].*inputs.drivers.scalers[2])
   z = @lift(mat(parameterisation, inputs, $parameters, steps)[3].*output.scaler)
-  surface!(ax3D, x, y, z, colormap = Reverse((:Spectral, 0.8),), transparency = true, alpha = 0.2, shading = false, colorrange = output.range) 
+  surface!(ax3D, x, y, z, colormap = Reverse((:Spectral, 0.8),), transparency = true, alpha = 0.2, shading = false, colorrange = output.range.*output.scaler) 
   cb = Colorbar(fig[1, 1:2][1, 2], colormap = Reverse(:Spectral), limits = output.range.*output.scaler, label = output.name)
   cb.alignmode = Mixed(right = 0)
 
