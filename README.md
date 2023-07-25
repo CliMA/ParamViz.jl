@@ -21,9 +21,9 @@ julia> output = Output("output", [-12, 12])
 ## Create method:
 ```jl
 julia> import ParamViz.parameterisation 
-julia> function parameterisation(x, y, p1, p2, c1, c2) # most CliMA function are defined like that...
-  return p1*sin(x) + p2*sin(y) + c1 + c2
-end
+julia> function parameterisation(x, y, p1, p2, c1, c2) # order is important
+         return p1*sin(x) + p2*sin(y) + c1 + c2
+       end
 ```
 ## Call webapp:
 ```jl
