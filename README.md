@@ -12,11 +12,11 @@ julia> using ParamViz
 ```
 ## Create structs:
 ```jl
-julia> drivers = Drivers(("x", "y"), (1, 1), ([-15, 15], [-5, 5]))
-julia> parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]))
+julia> drivers = Drivers(("x", "y"), (1, 1), ([-15, 15], [-5, 5]), (3, 1))
+julia> parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]), (10, 2))
 julia> constants = Constants(("c1", "c2"), (1.0, 1.0))
 julia> inputs = Inputs(drivers, parameters, constants)
-julia> output = Output("output", [-12, 12])
+julia> output = Output("output", [-12, 12], 2)
 ```
 ## Create method:
 ```jl
