@@ -64,8 +64,8 @@ function webapp(parameterisation, inputs, output)
     n_parameters = length(inputs.parameters.values)
     drivers_range = [round.(range(inputs.drivers.ranges[i][1].*inputs.drivers.scalers[i], inputs.drivers.ranges[i][2].*inputs.drivers.scalers[i], 12), sigdigits = 2) for i in 1:n_drivers]
     parameters_range = [round.(range(inputs.parameters.ranges[i][1].*inputs.parameters.scalers[i], inputs.parameters.ranges[i][2].*inputs.parameters.scalers[i], 12), sigdigits = 2) for i in 1:n_parameters]
-    drivers_sliders = [JSServe.TailwindDashboard.Slider(inputs.drivers.names[i], drivers_range[i].*inputs.drivers.scalers[i], value = drivers_range[i][6].*inputs.drivers.scalers[i]) for i in 1:n_drivers] |> Tuple
-    parameters_sliders = [JSServe.TailwindDashboard.Slider(inputs.parameters.names[i], parameters_range[i].*inputs.parameters.scalers[i], value = parameters_range[i][6].*inputs.parameters.scalers[i]) for i in 1:n_parameters] |> Tuple
+    drivers_sliders = [JSServe.TailwindDashboard.Slider(inputs.drivers.names[i], drivers_range[i], value = drivers_range[i][6]) for i in 1:n_drivers] |> Tuple
+    parameters_sliders = [JSServe.TailwindDashboard.Slider(inputs.parameters.names[i], parameters_range[i], value = parameters_range[i][6]) for i in 1:n_parameters] |> Tuple
     fig, out = param_dashboard(parameterisation, inputs, drivers_sliders, parameters_sliders, output)
     output_value = DOM.div(output.name, " = ", @lift(round($(out), sigdigits = 2)); style="font-size: 20px; font-weight: bold")
     drivers_label = DOM.div("Drivers:"; style="font-size: 16px; font-weight: bold")
