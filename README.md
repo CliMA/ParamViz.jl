@@ -16,7 +16,7 @@ julia> FT = Float64
 ```
 ## Create structs:
 ```jl
-julia> drivers = Drivers(("PAR (μmol m⁻² s⁻¹))", "LAI (m² m⁻²))"),
+julia> drivers = Drivers(("PAR (μmol m⁻² s⁻¹)", "LAI (m² m⁻²)"),
                          (FT.([0, 1500 * 1e-6]), FT.([0, 10])),
                          ((mol*m^-2*s^-1, μmol*m^-2*s^-1), (m^2*m^-2, m^2*m^-2))
                         )
