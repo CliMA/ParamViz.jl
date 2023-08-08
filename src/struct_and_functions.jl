@@ -107,12 +107,6 @@ function d2_vec(x, parameterisation::Function, inputs::Inputs, parameters, steps
   return vecM
 end
 
-## not needed?
-# methods for parameterisation
-# function parameterisation(inputs::Inputs)
-#   return parameterisation((inputs.drivers.values..., inputs.parameters.values..., inputs.constants.values...)...)
-# end
-
 function parameterisation(drivers, parameters, constants)
   return parameterisation((drivers..., parameters..., constants...)...)
 end

@@ -12,7 +12,8 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
   output_range_unitconverted = ustrip.(uconvert.(output.unit[2], (output.range)output.unit[1]))
 
   # JSServe layout
-  ax3D = Axis3(fig[1,1:2][1,1], xlabel = inputs.drivers.names[1], ylabel = inputs.drivers.names[2], zlabel = output.name); zlims!(ax3D, output_range_unitconverted)
+  ax3D = Axis3(fig[1,1:2][1,1], xlabel = inputs.drivers.names[1], ylabel = inputs.drivers.names[2], zlabel = output.name); zlims!(ax3D, output_range_unitconverted);
+  xlims!(ax3D, drivers_ranges_unitconverted[1][1], drivers_ranges_unitconverted[1][2]); ylims!(ax3D, drivers_ranges_unitconverted[2][1], drivers_ranges_unitconverted[2][2])
   ax_d1 = Axis(fig[2,1], xlabel = inputs.drivers.names[1], ylabel = output.name); ylims!(ax_d1, output_range_unitconverted); xlims!(ax_d1, drivers_ranges_unitconverted[1])
   ax_d2 = Axis(fig[2,2], xlabel = inputs.drivers.names[2], ylabel = output.name); ylims!(ax_d2, output_range_unitconverted); xlims!(ax_d2, drivers_ranges_unitconverted[2])
 
@@ -42,7 +43,7 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
   x = @lift(ustrip.(uconvert.(inputs.drivers.units[1][2], (mat(parameterisation, inputs, $parameters, steps)[1])*inputs.drivers.units[1][1])))
   y = @lift(ustrip.(uconvert.(inputs.drivers.units[2][2], (mat(parameterisation, inputs, $parameters, steps)[2])*inputs.drivers.units[2][1])))
   z = @lift(ustrip.(uconvert.(output.unit[2], (mat(parameterisation, inputs, $parameters, steps)[3])*output.unit[1])))
-  surface!(ax3D, x, y, z, colormap = Reverse((:Spectral, 0.8),), transparency = true, alpha = 0.8, shading = false, colorrange = output_range_unitconverted)
+  surface!(ax3D, x, y, z, colormap = Reverse(:Spectral), transparency = true, alpha = 0.8, shading = false, colorrange = output_range_unitconverted)
   cb = Colorbar(fig[1, 1:2][1, 2], colormap = Reverse(:Spectral), limits = output_range_unitconverted, label = output.name)
   cb.alignmode = Mixed(right = 0)
 
