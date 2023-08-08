@@ -1,31 +1,29 @@
 """
-  Drivers(names, values, ranges, scalers)
+  Drivers(names, ranges, units)
 
-A struct to store drivers names, values, ranges and scalers
+A struct to store drivers names, ranges and units
 """
 struct Drivers # Need 2 drivers always
   names 
-  values
   ranges
-  scalers
+  units
 end
 
 """
-  Parameters(names, values, ranges, scaler)
+  Parameters(names, ranges, units)
 
-A struct to store parameters names, values, ranges and scalers
+A struct to store parameters names, ranges and units
 """
 struct Parameters
   names
-  values
   ranges
-  scalers
+  units
 end
 
 """
-  Constant(names, values, ranges)
+  Constant(names, values)
 
-A struct to store constants names, values and ranges
+A struct to store constants names and values
 """
 struct Constants # should be able to be 0, or have a way to deal with 0
   names
@@ -35,8 +33,7 @@ end
 """
   Inputs(drivers, parameters, constants)
 
-A struct to store drivers, parameters and constants, 
-which are themselves struct storing their names, values and ranges.
+A struct to store drivers, parameters and constants. 
 """
 struct Inputs
   drivers::Drivers
@@ -45,14 +42,14 @@ struct Inputs
 end
 
 """
-  Output(name, range, scaler)
+  Output(name, range, unit)
 
-A struct to store output name, range and scaler.
+A struct to store output name, range and unit.
 """
 struct Output
   name
   range
-  scaler
+  unit
 end
 
 """
@@ -108,11 +105,6 @@ function d2_vec(x, parameterisation::Function, inputs::Inputs, parameters, steps
   constants = repeat([inputs.constants.values], steps)
   vecM = parameterisation.(drivers, parameters, constants)
   return vecM
-end
-
-# methods for parameterisation
-function parameterisation(inputs::Inputs)
-  return parameterisation((inputs.drivers.values..., inputs.parameters.values..., inputs.constants.values...)...)
 end
 
 function parameterisation(drivers, parameters, constants)

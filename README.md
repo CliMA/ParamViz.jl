@@ -1,28 +1,41 @@
 # ParamViz.jl - dynamic parameterisation web app 
-![ParamViz_demo_0 4](https://github.com/CliMA/ParamViz.jl/assets/22160257/f16d7704-d083-439d-b090-568c74733975)
-
+![chrome_a0AHoCQMHV](https://github.com/CliMA/ParamViz.jl/assets/22160257/832adffe-5a5b-4d46-9d15-a088bcb4b460)
 ## Install ParamViz.jl: (unregistered for now)
 ```jl
 julia> ]
 pkg> add https://github.com/CliMA/ParamViz.jl
 ```
-## Load package:
+## Load packages:
 ```jl
 julia> using ParamViz
+julia> using Unitful: m, s, mol, μmol
+julia> using ClimaLSM
+julia> using ClimaLSM.Canopy
+julia> FT = Float64
 ```
 ## Create structs:
 ```jl
-julia> drivers = Drivers(("x", "y"), (1, 1), ([-15, 15], [-5, 5]), (3, 1))
-julia> parameters = Parameters(("p1", "p2"), (1.0, 1.0), ([-5, 5], [-5, 5]), (10, 2))
-julia> constants = Constants(("c1", "c2"), (1.0, 1.0))
+julia> drivers = Drivers(("PAR (μmol m⁻² s⁻¹)", "LAI (m² m⁻²)"),
+                         (FT.([0, 1500 * 1e-6]), FT.([0, 10])),
+                         ((mol*m^-2*s^-1, μmol*m^-2*s^-1), (m^2*m^-2, m^2*m^-2))
+                        )
+
+julia> parameters = Parameters(("canopy reflectance, ρ_leaf",
+                                "extinction coefficient, K",
+                                "clumping index, Ω"),
+                               (FT.([0, 1]), FT.([0, 1]), FT.([0, 1])),
+                               ((m, m), (m, m), (m, m)) # dummy units, no conversion
+                              )
+julia> constants = Constants(("a", "b"), (FT(1), FT(2))) # dummy constants
 julia> inputs = Inputs(drivers, parameters, constants)
-julia> output = Output("output", [-12, 12], 2)
+julia> output = Output("APAR (μmol m⁻² s⁻¹)", [0, 1500 * 1e-6], (mol*m^-2*s^-1, μmol*m^-2*s^-1))
 ```
-## Create method:
+## Create method for parameterisation
 ```jl
-julia> import ParamViz.parameterisation 
-julia> function parameterisation(x, y, p1, p2, c1, c2) # order is important
-         return p1*sin(x) + p2*sin(y) + c1 + c2
+julia> import ParamViz.parameterisation
+julia> function parameterisation(PAR, LAI, ρ_leaf, K, Ω, a, b)   
+         APAR = plant_absorbed_ppfd(PAR, ρ_leaf, K, LAI, Ω) 
+         return APAR
        end
 ```
 ## Call webapp:
