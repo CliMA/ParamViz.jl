@@ -9,7 +9,7 @@ pkg> add https://github.com/CliMA/ParamViz.jl
 ## Load packages:
 ```jl
 julia> using ParamViz
-julia> using Unitful: mol, m, μmol
+julia> using Unitful: m, s, mol, μmol
 julia> using ClimaLSM
 julia> using ClimaLSM.Canopy
 julia> FT = Float64
