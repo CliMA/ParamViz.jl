@@ -1,3 +1,5 @@
+export param_dashboard, webapp
+
 """
     param_dashboard(parameterisation::Function, inputs::Inputs, sliders)
 
@@ -5,13 +7,13 @@ Generates a dashboard of a parameterisation(drivers, parameters, constants) func
 where the user can interact with driver and parameter values via sliders. 
 """
 function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sliders, parameters_sliders, output)
-  fig = Figure(resolution = (800, 800))
+  fig = Figure(size = (800, 800))
 
   drivers_ranges_unitconverted = [ustrip.(uconvert.(inputs.drivers.units[i][2], (inputs.drivers.ranges[i])inputs.drivers.units[i][1])) for i = 1:2]
   parameters_ranges_unitconverted = [ustrip.(uconvert.(inputs.parameters.units[i][2], (inputs.parameters.ranges[i])inputs.parameters.units[i][1])) for i = 1:length(inputs.parameters.units)]
   output_range_unitconverted = ustrip.(uconvert.(output.unit[2], (output.range)output.unit[1]))
 
-  # JSServe layout
+  # Bonito layout
   ax3D = Axis3(fig[1,1:2][1,1], xlabel = inputs.drivers.names[1], ylabel = inputs.drivers.names[2], zlabel = output.name); zlims!(ax3D, output_range_unitconverted);
   xlims!(ax3D, drivers_ranges_unitconverted[1][1], drivers_ranges_unitconverted[1][2]); ylims!(ax3D, drivers_ranges_unitconverted[2][1], drivers_ranges_unitconverted[2][2])
   ax_d1 = Axis(fig[2,1], xlabel = inputs.drivers.names[1], ylabel = output.name); ylims!(ax_d1, output_range_unitconverted); xlims!(ax_d1, drivers_ranges_unitconverted[1])
@@ -43,7 +45,7 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
   x = @lift(ustrip.(uconvert.(inputs.drivers.units[1][2], (mat(parameterisation, inputs, $parameters, steps)[1])*inputs.drivers.units[1][1])))
   y = @lift(ustrip.(uconvert.(inputs.drivers.units[2][2], (mat(parameterisation, inputs, $parameters, steps)[2])*inputs.drivers.units[2][1])))
   z = @lift(ustrip.(uconvert.(output.unit[2], (mat(parameterisation, inputs, $parameters, steps)[3])*output.unit[1])))
-  surface!(ax3D, x, y, z, colormap = Reverse(:Spectral), transparency = true, alpha = 0.8, shading = false, colorrange = output_range_unitconverted)
+  surface!(ax3D, x, y, z, colormap = Reverse(:Spectral), transparency = true, alpha = 0.8, shading = NoShading, colorrange = output_range_unitconverted)
   cb = Colorbar(fig[1, 1:2][1, 2], colormap = Reverse(:Spectral), limits = output_range_unitconverted, label = output.name)
   cb.alignmode = Mixed(right = 0)
 
@@ -56,7 +58,7 @@ function param_dashboard(parameterisation::Function, inputs::Inputs, drivers_sli
   # Plot 3D lines of model(drivers, params)
   lines!(ax3D, x_d1, c_d1, y_d1, color = :red, linewidth = 4) 
   lines!(ax3D, c_d2, x_d2, y_d2, color = :blue, linewidth = 4)
-  scatter!(ax3D, point3D, color = :black, markersize = 20, colormap = Reverse(:Spectral), colorrange = output.range,
+  scatter!(ax3D, point3D, color = :black, markersize = 5, colormap = Reverse(:Spectral), colorrange = output.range,
           strokewidth = 10, strokecolor = :black) # stroke not supported in WGLMakie?
 
   DataInspector(fig)
@@ -73,19 +75,19 @@ function webapp(parameterisation, inputs, output)
     n_parameters = length(inputs.parameters.names)
     drivers_range = [round.(range(drivers_ranges_unitconverted[i][1], drivers_ranges_unitconverted[i][2], 12), sigdigits = 2) for i in 1:n_drivers]
     parameters_range = [round.(range(parameters_ranges_unitconverted[i][1], parameters_ranges_unitconverted[i][2], 12), sigdigits = 2) for i in 1:n_parameters]
-    drivers_sliders = [JSServe.TailwindDashboard.Slider(inputs.drivers.names[i], drivers_range[i], value = drivers_range[i][6]) for i in 1:n_drivers] |> Tuple
-    parameters_sliders = [JSServe.TailwindDashboard.Slider(inputs.parameters.names[i], parameters_range[i], value = parameters_range[i][6]) for i in 1:n_parameters] |> Tuple
+    drivers_sliders = [Bonito.TailwindDashboard.Slider(inputs.drivers.names[i], drivers_range[i], value = drivers_range[i][6]) for i in 1:n_drivers] |> Tuple
+    parameters_sliders = [Bonito.TailwindDashboard.Slider(inputs.parameters.names[i], parameters_range[i], value = parameters_range[i][6]) for i in 1:n_parameters] |> Tuple
     fig, out = param_dashboard(parameterisation, inputs, drivers_sliders, parameters_sliders, output)
     output_value = DOM.div(output.name, " = ", @lift(round($(out), sigdigits = 2)); style="font-size: 20px; font-weight: bold")
     drivers_label = DOM.div("Drivers:"; style="font-size: 16px; font-weight: bold")
     parameters_label = DOM.div("Parameters:"; style="font-size: 16px; font-weight: bold")
     return DOM.div(
-                   JSServe.TailwindDashboard.Card(
-                   JSServe.TailwindDashboard.FlexCol(
-                                                     JSServe.TailwindDashboard.Card(output_value; class="container mx-auto"),
-                                                     JSServe.TailwindDashboard.FlexRow(
-                                                                                       JSServe.TailwindDashboard.Card(JSServe.TailwindDashboard.FlexCol(parameters_label, parameters_sliders...)),
-                                                                                       JSServe.TailwindDashboard.Card(JSServe.TailwindDashboard.FlexCol(drivers_label, drivers_sliders...))
+                   Bonito.TailwindDashboard.Card(
+                   Bonito.TailwindDashboard.FlexCol(
+                                                     Bonito.TailwindDashboard.Card(output_value; class="container mx-auto"),
+                                                     Bonito.TailwindDashboard.FlexRow(
+                                                                                       Bonito.TailwindDashboard.Card(Bonito.TailwindDashboard.FlexCol(parameters_label, parameters_sliders...)),
+                                                                                       Bonito.TailwindDashboard.Card(Bonito.TailwindDashboard.FlexCol(drivers_label, drivers_sliders...))
                                                                                       ),
                                                      fig)      
                                                     )
@@ -97,7 +99,7 @@ end
 
 #= with units
 using ParamViz
-using JSServe
+using Bonito
 using WGLMakie
 
 using Unitful: R, L, mol, K, kJ, °C, m, g, cm, hr, mg, s, μmol
