@@ -1,3 +1,6 @@
+export Drivers, Parameters, Constants, Inputs, Output # struct
+export mat, d1_vec, d2_vec, parameterisation # functions
+
 """
   Drivers(names, ranges, units)
 
